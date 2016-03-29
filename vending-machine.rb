@@ -6,6 +6,7 @@ class VendingMachine
   def initialize
     @running_total = 0.00
     @display_prompts = ""
+    @returned_coins = []
     update_display "INSERT COIN"
   end
   
@@ -17,6 +18,8 @@ class VendingMachine
       @running_total += 0.10
     when :q, :quarter
       @running_total += 0.25
+    else
+      @returned_coins << coin
     end
   end
   
@@ -27,6 +30,10 @@ class VendingMachine
   
   def present_display
     @display_prompts
+  end
+  
+  def coin_return
+    @returned_coins
   end
   
 end
@@ -62,6 +69,7 @@ class VendingMachineTest < MiniTest::Test
     @vm.receive_coin :penny
     
     assert_equal 0.00, @vm.running_total, "Vending machine accepts pennies?"
+    assert @vm.coin_return.include?(:penny), "Venching machine's coin return empty?"
   end
   
 end
