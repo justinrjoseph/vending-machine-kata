@@ -13,6 +13,8 @@ class VendingMachine
       @running_total += 0.05
     when :d, :dime
       @running_total += 0.10
+    when :q, :quarter
+      @running_total += 0.25
     end
   end
   
@@ -36,6 +38,12 @@ class VendingMachineTest < MiniTest::Test
     @vm.receive_coin :dime
     
     assert_equal 0.10, @vm.running_total, "Vending machine does not accept dimes?"
+  end
+  
+  def test_vending_machine_accepts_quarters
+    @vm.receive_coin :quarter
+    
+    assert_equal 0.25, @vm.running_total, "Vending machine does not accept quarters?"
   end
   
 end
