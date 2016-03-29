@@ -48,4 +48,18 @@ class VendingMachineTest < MiniTest::Test
     assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
   end
   
+  def test_customer_purchases_chips_from_vending_machine
+    2.times { @vm.receive_coin :quarter }
+    
+    assert_equal 0.50, @vm.running_total, "Vending machine total not $0.50?"
+    
+    @vm.dispense_product :chips
+    
+    assert_equal "THANK YOU", @vm.present_display, "Vending machine does not display 'THANK YOU'?"
+    
+    assert_equal :chips, @vm.product_return, "Vending machine did not dispense chips?"
+    assert_equal 0.00, @vm.running_total, "Vending machine running total not reset?"
+    assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+  end
+  
 end
