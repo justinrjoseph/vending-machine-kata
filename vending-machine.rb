@@ -4,7 +4,7 @@ class VendingMachine
   attr_reader :running_total
   
   def initialize
-    @running_total = 0
+    @running_total = 0.00
   end
   
   def receive_coin(coin)
@@ -44,6 +44,12 @@ class VendingMachineTest < MiniTest::Test
     @vm.receive_coin :quarter
     
     assert_equal 0.25, @vm.running_total, "Vending machine does not accept quarters?"
+  end
+  
+  def test_vending_machine_rejects_pennies
+    @vm.receive_coin :penny
+    
+    assert_equal 0.00, @vm.running_total, "Vending machine accepts pennies?"
   end
   
 end
