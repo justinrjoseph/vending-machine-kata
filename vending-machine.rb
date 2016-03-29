@@ -5,6 +5,8 @@ class VendingMachine
   
   def initialize
     @running_total = 0.00
+    @display_prompts = ""
+    update_display "INSERT COIN"
   end
   
   def receive_coin(coin)
@@ -18,6 +20,15 @@ class VendingMachine
     end
   end
   
+  def update_display(prompt)
+    @display_prompts += prompt
+    present_display
+  end
+  
+  def present_display
+    @display_prompts
+  end
+  
 end
 
 
@@ -26,6 +37,7 @@ class VendingMachineTest < MiniTest::Test
   
   def setup
     @vm = VendingMachine.new
+    assert_equal "INSERT COIN", @vm.present_display, "Venching machine does not prompt with 'INSERT COIN'?"
   end
   
   def test_vending_machine_accepts_nickels
