@@ -4,7 +4,6 @@ class VendingMachine
   
   def initialize
     @running_total = 0.00
-    @display_prompts = ""
     @returned_coins = []
 
     update_display "INSERT COIN"
@@ -23,17 +22,28 @@ class VendingMachine
     end
   end
   
+  def dispense_product(product)
+    @dispensed_product = product
+    update_display "THANK YOU"
+  end
+  
   def update_display(prompt)
-    @display_prompts += prompt
+    @display_prompt = prompt
     present_display
   end
   
   def present_display
-    @display_prompts
+    @display_prompt
   end
   
   def coin_return
     @returned_coins
+  end
+  
+  def product_return
+    update_display "INSERT COIN"
+    @running_total = 0.00
+    @dispensed_product
   end
   
 end
