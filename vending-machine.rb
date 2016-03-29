@@ -1,18 +1,17 @@
 require 'minitest/autorun'
 
 class VendingMachine
+  attr_reader :running_total
+  
+  def initialize
+    @running_total = 0
+  end
   
   def receive_coin(coin)
-    @running_total = 0
-    
     case coin
     when :n, :nickel
       @running_total += 0.05
     end
-  end
-  
-  def running_total
-    @running_total
   end
   
 end
