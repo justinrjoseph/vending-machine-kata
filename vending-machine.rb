@@ -22,14 +22,27 @@ class VendingMachine
     end
   end
   
-  def dispense_product(product)
-    @dispensed_product = product
-    update_display "THANK YOU"
-  end
-  
-  def update_display(prompt)
-    @display_prompt = prompt
-    present_display
+  def receive_product_choice(chosen_product)
+    @chosen_product = chosen_product
+    
+    case chosen_product
+    when :cola
+      necessary_amount = 1.00
+    when :chips
+      necessary_amount = 0.50
+    when :candy
+      necessary_amount = 0.65
+    end
+    
+    if necessary_amount
+      if necessary_amount == @running_total
+        update_display "THANK YOU"
+      else
+        update_display "PRICE $#{necessary_amount} | DEPOSITED $#{@running_total}"
+      end
+    else
+      update_display "CHOICE NOT AVAILABLE, SORRY."
+    end
   end
   
   def present_display
@@ -40,10 +53,21 @@ class VendingMachine
     @returned_coins
   end
   
-  def product_return
+  def dispense_product
     update_display "INSERT COIN"
     @running_total = 0.00
-    @dispensed_product
+    @chosen_product
   end
+  
+  def dispensed_product
+    @chosen_product
+  end
+  
+  private
+  
+    def update_display(prompt)
+      @display_prompt = prompt
+      present_display
+    end
   
 end
