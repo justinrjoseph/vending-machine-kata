@@ -38,7 +38,7 @@ class VendingMachine
       if necessary_amount == @running_total
         update_display "THANK YOU"
       else
-        update_display "PRICE $#{necessary_amount} | DEPOSITED $#{@running_total}"
+        update_display "PRICE $#{sprintf('%.2f', necessary_amount)} | DEPOSITED $#{@running_total}"
       end
     else
       update_display "CHOICE NOT AVAILABLE, SORRY."
