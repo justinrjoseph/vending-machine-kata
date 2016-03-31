@@ -24,7 +24,7 @@ class VendingMachineTest < MiniTest::Test
   def test_vending_machine_rejects_pennies
     vending_machine_acccepts? :penny, 0.00
     
-    assert @vm.coin_return.include?(:penny), "Vending machine's coin return is empty?"
+    assert_equal [:penny], @vm.coin_return, "Vending machine's coin return is empty?"
   end
 
   def test_customer_purchases_cola_from_vending_machine
@@ -48,19 +48,59 @@ class VendingMachineTest < MiniTest::Test
   def test_customer_needs_more_money_for_cola
     deposit_coins [3, :quarter]
     
-    validate_remaining_amount_needed :cola, 1.00, 0.75
+    validate_remaining_amount_needed :cola, 1, 0.75
   end
 
   def test_customer_needs_more_money_for_chips
     deposit_coins [[1, :quarter], [1, :dime]]
     
-    validate_remaining_amount_needed :chips, 0.50, 0.35
+    validate_remaining_amount_needed :chips, 0.5, 0.35
   end
 
   def test_customer_needs_more_money_for_candy
     deposit_coins [[2, :quarter], [1, :dime]]
     
     validate_remaining_amount_needed :candy, 0.65, 0.60
+  end
+
+  def test_vending_machine_returns_four_quarters
+    coins = [4, :quarter]
+    
+    deposit_coins coins
+    
+    validate_coin_return coins
+  end
+
+  def test_vending_machine_returns_five_dimes
+    coins = [5, :dime]
+    
+    deposit_coins coins
+    
+    validate_coin_return coins
+  end
+
+  def test_vending_machine_returns_ten_nickels
+    coins = [10, :nickel]
+    
+    deposit_coins coins
+    
+    validate_coin_return coins
+  end
+
+  def test_vending_machine_returns_two_quarters_and_one_dime
+    coins = [[2, :quarter], [1, :dime]]
+    
+    deposit_coins coins
+    
+    validate_coin_return coins
+  end
+
+  def test_vending_machine_returns_one_quarter_two_dimes_and_one_nickel
+    coins = [[1, :quarter], [2, :dime], [1, :nickel]]
+    
+    deposit_coins coins
+    
+    validate_coin_return coins
   end
 
   private
@@ -92,7 +132,7 @@ class VendingMachineTest < MiniTest::Test
       @vm.dispense_product
     
       assert_equal product, @vm.dispensed_product, "Vending machine did not dispense #{product}?"
-      assert_equal 0.00, @vm.running_total, "Vending machine running total not reset?"
+      assert_equal 0, @vm.running_total, "Vending machine running total not reset?"
       assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
     end
     
@@ -104,6 +144,23 @@ class VendingMachineTest < MiniTest::Test
       @vm.receive_product_choice product
     
       assert_equal "PRICE $#{amount} | DEPOSITED $#{@vm.running_total}", @vm.present_display, "Vending machine does not display 'PRICE $#{amount} | DEPOSITED $#{short}?"
+    end
+    
+    def validate_coin_return(coins)
+      if coins.flatten.count == 2
+        count = coins[0]
+        coin = coins[1]
+  
+        assert_equal count, @vm.coin_return.count, "Vending machine did not return #{count} #{coin}(s)?"
+        assert_equal coin, @vm.coin_return.uniq.first, "Vending machine did not a #{coin}?"
+      else
+        coins.each do |total_coins, coin|
+          assert_equal total_coins, @vm.coin_return.count(coin), "Vending machine did not return #{total_coins} #{coin}(s)?"
+          assert @vm.coin_return.uniq.include?(coin), "Vending machine did not a #{coin}?"
+        end
+      end
+      
+      assert_equal "INSERT COIN", @vm.present_display, "Venching machine does not prompt with 'INSERT COIN'?"
     end
 
 end

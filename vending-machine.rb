@@ -5,6 +5,7 @@ class VendingMachine
   def initialize
     @running_total = 0.00
     @returned_coins = []
+    @coins_to_return = []
 
     update_display "INSERT COIN"
   end
@@ -12,10 +13,13 @@ class VendingMachine
   def receive_coin(coin)
     case coin
     when :n, :nickel
+      @coins_to_return << coin
       @running_total += 0.05
     when :d, :dime
+      @coins_to_return << coin
       @running_total += 0.10
     when :q, :quarter
+      @coins_to_return << coin
       @running_total += 0.25
     else
       @returned_coins << coin
@@ -50,7 +54,8 @@ class VendingMachine
   end
   
   def coin_return
-    @returned_coins
+    return @returned_coins if @returned_coins.any?
+    return @coins_to_return if @coins_to_return.any?
   end
   
   def dispense_product
@@ -61,6 +66,13 @@ class VendingMachine
   
   def dispensed_product
     @chosen_product
+  end
+  
+  def return_coins
+    returned_coins = @running_total
+    @running_total = 0.00
+    update_display "INSERT COIN"
+    returned_coins
   end
   
   private
