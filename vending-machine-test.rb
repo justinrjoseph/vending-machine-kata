@@ -8,7 +8,7 @@ class VendingMachineTest < MiniTest::Test
     
     assert_equal "INSERT COIN", @vm.present_display, "Venching machine does not prompt with 'INSERT COIN'?"
   end
-=begin
+
   def test_vending_machine_accepts_nickels
     vending_machine_acccepts? :nickel, 0.05
   end
@@ -102,7 +102,7 @@ class VendingMachineTest < MiniTest::Test
     
     validate_coin_return coins
   end
-=end
+
   def test_vending_machine_issues_ten_cents_change_for_candy
     deposit_coins [3, :quarter]
     
