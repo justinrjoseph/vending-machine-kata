@@ -39,7 +39,10 @@ class VendingMachine
     end
     
     if necessary_amount
-      if necessary_amount == @running_total
+      @coins_to_return = []
+
+      if ( necessary_amount == @running_total ) || ( @running_total > necessary_amount )
+        issue_change(necessary_amount) if @running_total > necessary_amount
         update_display "THANK YOU"
       else
         update_display "PRICE $#{sprintf('%.2f', necessary_amount)} | DEPOSITED $#{@running_total}"
@@ -73,6 +76,41 @@ class VendingMachine
     @running_total = 0.00
     update_display "INSERT COIN"
     returned_coins
+  end
+  
+  def issue_change(necessary_amount)
+    amount_to_return = ( @running_total - necessary_amount ).round 2
+
+    case amount_to_return
+    when 1.00
+      4.times { @coins_to_return << :quarter }
+    when 0.75
+      3.times { @coins_to_return << :quarter }
+    when 0.50
+      2.times { @coins_to_return << :quarter }
+    end
+    
+    if amount_to_return >= 0.25 && amount_to_return < 0.50
+      @coins_to_return << :quarter
+      
+      2.times { @coins_to_return << :dime } if amount_to_return > 0.4
+      
+      @coins_to_return << :dime << :nickel if amount_to_return == 0.4
+      
+      @coins_to_return << :dime if amount_to_return == 0.35
+      
+      @coins_to_return << :nickel if amount_to_return == 0.3
+    end
+    
+    if amount_to_return >= 0.10 && amount_to_return <= 0.20
+      2.times { @coins_to_return << :dime } if amount_to_return == 0.20
+      
+      @coins_to_return << :dime << :nickel if amount_to_return == 0.15
+      
+      @coins_to_return << :dime
+    else
+      @coins_to_return << :nickel
+    end
   end
   
   private
