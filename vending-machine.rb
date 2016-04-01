@@ -3,6 +3,7 @@ class VendingMachine
   attr_reader :running_total
   
   def initialize
+    @change_available = 0.00
     @running_total = 0.00
     @returned_coins = []
     @coins_to_return = []
@@ -115,6 +116,10 @@ class VendingMachine
   
   def refresh_state_after_sold_out
     @running_total > 0 ? update_display("DEPOSITED $#{@running_total}") : update_display("INSERT COIN")
+  end
+  
+  def requires_exact_change
+    update_display "EXACT CHANGE ONLY" if @change_available = 0.00
   end
   
   private

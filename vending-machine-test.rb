@@ -111,14 +111,18 @@ class VendingMachineTest < MiniTest::Test
     validate_change_returned [1, :dime]
   end
 
-  def test_venching_machine_is_sold_out_of_gum
+  def test_vending_machine_is_sold_out_of_gum
     choose_product :gum, 0.50
   end
 
-  def test_venching_machine_is_sold_out_of_candy_bar
+  def test_vending_machine_is_sold_out_of_candy_bar
     deposit_coins [3, :quarter]
     
     choose_product :candy_bar, 0.75
+  end
+  
+  def test_vending_machine_requires_exact_change
+    validate_vending_machine_requires_exact_change
   end
 
   private
@@ -203,6 +207,12 @@ class VendingMachineTest < MiniTest::Test
       else
         assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
       end
+    end
+    
+    def validate_vending_machine_requires_exact_change
+      @vm.requires_exact_change
+
+      assert_equal "EXACT CHANGE ONLY", @vm.present_display, "Vending machine does not prompt with 'EXACT CHANGE ONLY'?"
     end
 
 end
