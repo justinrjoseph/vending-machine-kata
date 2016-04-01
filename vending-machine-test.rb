@@ -6,7 +6,7 @@ class VendingMachineTest < MiniTest::Test
   def setup
     @vm = VendingMachine.new
     
-    assert_equal "INSERT COIN", @vm.present_display, "Venching machine does not prompt with 'INSERT COIN'?"
+    assert_equal "INSERT COIN", @vm.display, "Venching machine does not prompt with 'INSERT COIN'?"
   end
 
   def test_vending_machine_accepts_nickels
@@ -30,19 +30,19 @@ class VendingMachineTest < MiniTest::Test
   def test_customer_purchases_cola_from_vending_machine
     deposit_coins [4, :quarter]
     
-    choose_product :cola, 1.00
+    choose_product :cola
   end
 
   def test_customer_purchases_chips_from_vending_machine
     deposit_coins [2, :quarter]
     
-    choose_product :chips, 0.50
+    choose_product :chips
   end
 
   def test_customer_purchases_candy_from_vending_machine
     deposit_coins [[2, :quarter], [1, :dime], [1, :nickel]]
     
-    choose_product :candy, 0.65
+    choose_product :candy
   end
   
   def test_customer_needs_more_money_for_cola
@@ -106,19 +106,19 @@ class VendingMachineTest < MiniTest::Test
   def test_vending_machine_issues_ten_cents_change_for_candy
     deposit_coins [3, :quarter]
     
-    choose_product :candy, 0.65
+    choose_product :candy
     
     validate_change_returned [1, :dime]
   end
 
   def test_vending_machine_is_sold_out_of_gum
-    choose_product :gum, 0.50
+    choose_product :gum
   end
 
   def test_vending_machine_is_sold_out_of_candy_bar
     deposit_coins [3, :quarter]
     
-    choose_product :candy_bar, 0.75
+    choose_product :candy_bar
   end
   
   def test_vending_machine_requires_exact_change
@@ -128,7 +128,7 @@ class VendingMachineTest < MiniTest::Test
   private
   
     def vending_machine_acccepts?(coin, amount)
-      @vm.receive_coin coin
+      @vm.accept_coin coin
       
       assert_equal amount, @vm.running_total, "Vending machine does not accept #{coin.to_s}s?"
     end
@@ -138,25 +138,25 @@ class VendingMachineTest < MiniTest::Test
         total_coins = deposits[0]
         coin = deposits[1]
       
-        total_coins.times { @vm.receive_coin coin }
+        total_coins.times { @vm.accept_coin coin }
       else
         deposits.each do |total_coins, coin|
-          total_coins.times { @vm.receive_coin coin }
+          total_coins.times { @vm.accept_coin coin }
         end
       end
     end
     
-    def choose_product(product, amount)
+    def choose_product(product)
       @vm.receive_product_choice product
     
       if [:cola, :chips, :candy].include? product
-        assert_equal "THANK YOU", @vm.present_display, "Vending machine does not display 'THANK YOU'?"
+        assert_equal "THANK YOU", @vm.display, "Vending machine does not display 'THANK YOU'?"
       
         @vm.dispense_product
       
         assert_equal product, @vm.dispensed_product, "Vending machine did not dispense #{product}?"
-        assert_equal 0, @vm.running_total, "Vending machine running total not reset?"
-        assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+        assert_equal 0.00, @vm.running_total, "Vending machine running total not reset?"
+        assert_equal "INSERT COIN", @vm.display, "Vending machine does not prompt with 'INSERT COIN'?"
       else
         validate_sold_out
         
@@ -164,14 +164,14 @@ class VendingMachineTest < MiniTest::Test
       end
     end
     
-    def validate_remaining_amount_needed(product, amount, short)
+    def validate_remaining_amount_needed(product, amount, short_amount)
       amount = '%.2f' % amount
       
-      assert_equal short, @vm.running_total, "Vending machine total not $#{short}?"
+      assert_equal short_amount, @vm.running_total, "Vending machine total not $#{short_amount}?"
     
       @vm.receive_product_choice product
     
-      assert_equal "PRICE $#{amount} | DEPOSITED $#{@vm.running_total}", @vm.present_display, "Vending machine does not display 'PRICE $#{amount} | DEPOSITED $#{short}?"
+      assert_equal "PRICE $#{amount} | DEPOSITED $#{@vm.running_total}", @vm.display, "Vending machine does not display 'PRICE $#{amount} | DEPOSITED $#{short_amount}?"
     end
     
     def validate_coin_return(coins)
@@ -188,7 +188,7 @@ class VendingMachineTest < MiniTest::Test
         end
       end
       
-      assert_equal "INSERT COIN", @vm.present_display, "Venching machine does not prompt with 'INSERT COIN'?"
+      assert_equal "INSERT COIN", @vm.display, "Venching machine does not prompt with 'INSERT COIN'?"
     end
     
     def validate_change_returned(coins)
@@ -196,23 +196,23 @@ class VendingMachineTest < MiniTest::Test
     end
     
     def validate_sold_out
-      assert_equal "SOLD OUT", @vm.present_display, "Vending machine does not prompt with 'SOLD OUT'?"
+      assert_equal "SOLD OUT", @vm.display, "Vending machine does not prompt with 'SOLD OUT'?"
     end
     
     def validate_vending_machine_state_after_sold_out
       @vm.refresh_state_after_sold_out
       
       if @vm.running_total > 0.00
-        assert_equal "DEPOSITED $#{@vm.running_total}", @vm.present_display, "Vending machine does not prompt with 'DEPOSITED $#{@running_total}'?"
+        assert_equal "DEPOSITED $#{@vm.running_total}", @vm.display, "Vending machine does not prompt with 'DEPOSITED $#{@running_total}'?"
       else
-        assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+        assert_equal "INSERT COIN", @vm.display, "Vending machine does not prompt with 'INSERT COIN'?"
       end
     end
     
     def validate_vending_machine_requires_exact_change
       @vm.requires_exact_change
 
-      assert_equal "EXACT CHANGE ONLY", @vm.present_display, "Vending machine does not prompt with 'EXACT CHANGE ONLY'?"
+      assert_equal "EXACT CHANGE ONLY", @vm.display, "Vending machine does not prompt with 'EXACT CHANGE ONLY'?"
     end
 
 end
