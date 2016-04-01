@@ -111,6 +111,16 @@ class VendingMachineTest < MiniTest::Test
     validate_change_returned [1, :dime]
   end
 
+  def test_venching_machine_is_sold_out_of_gum
+    choose_product :gum, 0.50
+  end
+
+  def test_venching_machine_is_sold_out_of_candy_bar
+    deposit_coins [3, :quarter]
+    
+    choose_product :candy_bar, 0.75
+  end
+
   private
   
     def vending_machine_acccepts?(coin, amount)
@@ -135,13 +145,19 @@ class VendingMachineTest < MiniTest::Test
     def choose_product(product, amount)
       @vm.receive_product_choice product
     
-      assert_equal "THANK YOU", @vm.present_display, "Vending machine does not display 'THANK YOU'?"
-    
-      @vm.dispense_product
-    
-      assert_equal product, @vm.dispensed_product, "Vending machine did not dispense #{product}?"
-      assert_equal 0, @vm.running_total, "Vending machine running total not reset?"
-      assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+      if [:cola, :chips, :candy].include? product
+        assert_equal "THANK YOU", @vm.present_display, "Vending machine does not display 'THANK YOU'?"
+      
+        @vm.dispense_product
+      
+        assert_equal product, @vm.dispensed_product, "Vending machine did not dispense #{product}?"
+        assert_equal 0, @vm.running_total, "Vending machine running total not reset?"
+        assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+      else
+        validate_sold_out
+        
+        validate_vending_machine_state_after_sold_out
+      end
     end
     
     def validate_remaining_amount_needed(product, amount, short)
@@ -173,6 +189,20 @@ class VendingMachineTest < MiniTest::Test
     
     def validate_change_returned(coins)
       validate_coin_return(coins)
+    end
+    
+    def validate_sold_out
+      assert_equal "SOLD OUT", @vm.present_display, "Vending machine does not prompt with 'SOLD OUT'?"
+    end
+    
+    def validate_vending_machine_state_after_sold_out
+      @vm.refresh_state_after_sold_out
+      
+      if @vm.running_total > 0.00
+        assert_equal "DEPOSITED $#{@vm.running_total}", @vm.present_display, "Vending machine does not prompt with 'DEPOSITED $#{@running_total}'?"
+      else
+        assert_equal "INSERT COIN", @vm.present_display, "Vending machine does not prompt with 'INSERT COIN'?"
+      end
     end
 
 end

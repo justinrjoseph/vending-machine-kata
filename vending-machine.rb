@@ -37,10 +37,10 @@ class VendingMachine
     when :candy
       necessary_amount = 0.65
     end
-    
-    if necessary_amount
-      @coins_to_return = []
+  
+    @coins_to_return = []
 
+    if necessary_amount
       if ( necessary_amount == @running_total ) || ( @running_total > necessary_amount )
         issue_change(necessary_amount) if @running_total > necessary_amount
         update_display "THANK YOU"
@@ -48,7 +48,7 @@ class VendingMachine
         update_display "PRICE $#{sprintf('%.2f', necessary_amount)} | DEPOSITED $#{@running_total}"
       end
     else
-      update_display "CHOICE NOT AVAILABLE, SORRY."
+      update_display "SOLD OUT"
     end
   end
   
@@ -111,6 +111,10 @@ class VendingMachine
     else
       @coins_to_return << :nickel
     end
+  end
+  
+  def refresh_state_after_sold_out
+    @running_total > 0 ? update_display("DEPOSITED $#{@running_total}") : update_display("INSERT COIN")
   end
   
   private
